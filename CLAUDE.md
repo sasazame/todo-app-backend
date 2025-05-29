@@ -400,3 +400,73 @@ spring:
 - 重要操作の監査ログ（AOP実装）
 - 個人情報のマスキング
 - ログローテーション設定
+
+## 開発ナレッジ（2025年5月実装時）
+
+### 環境構築
+1. **必要なツールのバージョン**
+   - Java 21 (OpenJDK)
+   - Maven 3.8+
+   - PostgreSQL 16+
+   - Node.js 18+ (フロントエンド連携用)
+
+2. **PostgreSQLセットアップ**
+   ```bash
+   # データベースとユーザー作成
+   sudo -u postgres psql -c "CREATE DATABASE todoapp;"
+   sudo -u postgres psql -c "CREATE USER todoapp WITH ENCRYPTED PASSWORD 'todoapp';"
+   sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE todoapp TO todoapp;"
+   sudo -u postgres psql -c "ALTER DATABASE todoapp OWNER TO todoapp;"
+   ```
+
+3. **Spring Initializr設定**
+   - Dependencies: web, data-jpa, postgresql, flyway, validation, security, actuator, devtools, lombok
+   - Java Version: 21
+   - Spring Boot: 3.3.7
+
+### 実装時の注意点
+
+1. **Lombok使用時**
+   - pom.xmlにLombok依存関係を追加（Spring Initializrで選択しなかった場合）
+   - `@RequiredArgsConstructor`でコンストラクタインジェクション
+
+2. **application.yml設定**
+   - Flywayの`baseline-on-migrate: true`で既存DBへの適用を可能に
+   - JPAの`open-in-view: false`でN+1問題を防ぐ
+   - Hibernateの`ddl-auto: validate`で予期しないスキーマ変更を防ぐ
+
+3. **ヘキサゴナルアーキテクチャ実装**
+   - domain層は他の層に依存しない
+   - インターフェースと実装を分離（TodoRepository/TodoRepositoryImpl）
+   - DTOは各層で分離（過度な共有を避ける）
+
+4. **開発時の一時的な対応**
+   - Spring Securityを一時的に無効化（SecurityConfig）
+   - 本番環境では必ず認証・認可を実装
+
+### トラブルシューティング
+
+1. **Gitコミット時のエラー**
+   - ユーザー設定が必要: `git config user.email/user.name`
+   - リポジトリごとの設定は`--global`を省略
+
+2. **Flyway実行エラー**
+   - ファイル名規則: `V<version>__<description>.sql`
+   - 既存DBの場合は`baseline-on-migrate: true`を設定
+
+3. **CORS関連**
+   - `@CrossOrigin`とSecurityConfigの両方で設定
+   - 開発時はlocalhost:3000を許可
+
+### パフォーマンス考慮事項
+- HikariCPのコネクションプール設定を適切に調整
+- JPAのN+1問題を回避（適切なfetch戦略）
+- ページネーションでメモリ使用量を制御
+
+### 今後の改善ポイント
+1. JWT認証の実装
+2. MapStructによるDTO-Entityマッピング
+3. TestContainersを使った統合テスト
+4. OpenAPI (Swagger)ドキュメント生成
+5. 監査ログ（Spring AOP）
+6. キャッシュ戦略（Spring Cache）
