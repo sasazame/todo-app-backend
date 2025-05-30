@@ -1,5 +1,8 @@
 # TODO App Backend
 
+[![CI Pipeline](https://github.com/sasazame/todo-app-backend/actions/workflows/ci.yml/badge.svg)](https://github.com/sasazame/todo-app-backend/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/sasazame/todo-app-backend/branch/main/graph/badge.svg)](https://codecov.io/gh/sasazame/todo-app-backend)
+
 Spring Boot + PostgreSQL で構築されたTODOアプリケーションのバックエンドAPI
 
 ## 🚀 プロジェクト概要
