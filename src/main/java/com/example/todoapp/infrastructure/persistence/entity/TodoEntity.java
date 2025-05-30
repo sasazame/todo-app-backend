@@ -21,6 +21,9 @@ public class TodoEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+
     @Column(nullable = false, length = 255)
     private String title;
 
@@ -50,8 +53,9 @@ public class TodoEntity {
     public TodoEntity() {
     }
 
-    public TodoEntity(String title, String description, TodoStatus status, 
+    public TodoEntity(Long userId, String title, String description, TodoStatus status, 
                       TodoPriority priority, LocalDate dueDate) {
+        this.userId = userId;
         this.title = title;
         this.description = description;
         this.status = status;
@@ -66,6 +70,14 @@ public class TodoEntity {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public String getTitle() {

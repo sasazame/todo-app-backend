@@ -61,4 +61,14 @@ public class TodoRepositoryImpl implements TodoRepository {
     public boolean existsById(Long id) {
         return todoJpaRepository.existsById(id);
     }
+
+    @Override
+    public Page<TodoEntity> findByUserId(Long userId, Pageable pageable) {
+        return todoJpaRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
+    }
+
+    @Override
+    public List<TodoEntity> findByUserIdAndStatus(Long userId, TodoStatus status) {
+        return todoJpaRepository.findByUserIdAndStatusOrderByCreatedAtDesc(userId, status);
+    }
 }
