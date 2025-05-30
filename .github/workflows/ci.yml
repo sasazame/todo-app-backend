@@ -54,15 +54,10 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-maven-
 
-    - name: Run tests
-      run: mvn clean test
+    - name: Run all tests
+      run: mvn clean verify -Dmaven.test.failure.ignore=true
       env:
         SPRING_PROFILES_ACTIVE: test
-
-    - name: Run integration tests
-      run: mvn verify
-      env:
-        SPRING_PROFILES_ACTIVE: ci
         SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/todoapp_test
         SPRING_DATASOURCE_USERNAME: todoapp
         SPRING_DATASOURCE_PASSWORD: todoapp
@@ -72,7 +67,9 @@ jobs:
       if: success() || failure()
       with:
         name: Maven Tests
-        path: todo-app-backend/target/surefire-reports/*.xml
+        path: |
+          todo-app-backend/target/surefire-reports/*.xml
+          todo-app-backend/target/failsafe-reports/*.xml
         reporter: java-junit
 
     - name: Generate coverage report
