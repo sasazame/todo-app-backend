@@ -52,31 +52,54 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 **タイプ**: feat, fix, docs, style, refactor, perf, test, chore, build, ci
 
 ## テスト方針
-- 単体テスト: JUnit 5 + Mockito（Service層中心）
-- 統合テスト: @SpringBootTest + TestContainers
-- APIテスト: @WebMvcTest + MockMvc
-- カバレッジ: 80%以上（Service層100%）
+- **単体テスト**: JUnit 5 + Mockito（Service層中心）
+- **統合テスト**: @SpringBootTest + MockMvc + H2
+- **セキュリティテスト**: JWT認証・認可動作検証
+- **APIテスト**: 認証込みエンドポイントテスト
+- **カバレッジ**: 80%以上（Service層90%以上）
+
+### テスト環境設定
+- **DB**: H2 In-Memory（専用テスト用Flyway migrations）
+- **設定**: `application-test.yml`
+- **認証**: テスト用JWT設定
 
 ## アーキテクチャ構造
 ```
 src/main/java/com/example/todoapp/
 ├── common/              # 共通コンポーネント
+│   ├── config/         # SecurityConfig等
+│   ├── exception/      # グローバル例外ハンドリング
+│   ├── util/           # ユーティリティ
+│   └── validation/     # バリデーション
 ├── domain/              # ドメイン層（他に依存しない）
+│   ├── model/          # User, Todo, Enum等
+│   └── repository/     # リポジトリインターフェース
 ├── application/         # アプリケーション層
+│   ├── dto/            # アプリケーション層DTO
+│   └── service/        # ビジネスロジック
 ├── infrastructure/      # インフラ層
+│   ├── persistence/    # JPA実装
+│   └── security/       # JWT処理等
 └── presentation/        # プレゼンテーション層
+    ├── controller/     # REST API
+    ├── dto/            # リクエスト/レスポンスDTO
+    └── mapper/         # DTO変換
 ```
 
 ## API仕様
-- ベースURL: `/api/v1`
-- RESTful設計、適切なHTTPステータス
-- CORS設定: localhost:3000許可
-- エラーレスポンス統一形式
+- **ベースURL**: `/api/v1`
+- **認証**: JWT Bearer Token（一部エンドポイントを除く）
+- **認証不要**: `/auth/register`, `/auth/login`
+- **認証必須**: `/todos/**`（ユーザーは自分のTODOのみアクセス可能）
+- **CORS**: localhost:3000許可、適切なヘッダー設定
+- **エラーレスポンス**: 統一形式（401, 403, 404等）
 
 ## セキュリティ
-- 現在: 認証無効化（開発用）
-- 本番: JWT認証・認可必須
-- CORS、XSS、SQLインジェクション対策
+- **認証**: JWT Bearer Token（JJWT 0.12.5使用）
+- **認可**: エンドポイント別アクセス制御
+- **パスワード**: BCrypt暗号化
+- **アクセス制御**: ユーザーは自分のTODOのみアクセス可能
+- **CORS**: localhost:3000許可、適切なヘッダー設定
 
 ## Claude Codeへの依頼テンプレート
 ```markdown

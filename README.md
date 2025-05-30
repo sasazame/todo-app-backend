@@ -12,14 +12,18 @@ Spring Boot + PostgreSQL で構築されたTODOアプリケーションのバッ
 - **アーキテクチャ**: ヘキサゴナルアーキテクチャ（ポート&アダプター）
 
 ### 主な機能
-- ✅ TODOの CRUD 操作（作成・取得・更新・削除）
-- ✅ ステータス管理（TODO/進行中/完了）
-- ✅ 優先度設定（高/中/低）
-- ✅ 期限日設定
-- ✅ ページネーション対応
-- ✅ RESTful API 設計
-- ✅ バリデーション
-- ✅ グローバル例外ハンドリング
+- ✅ **認証・認可**: JWT ベースの認証システム
+- ✅ **ユーザー管理**: ユーザー登録・ログイン機能
+- ✅ **TODO管理**: CRUD 操作（作成・取得・更新・削除）
+- ✅ **アクセス制御**: ユーザーは自分のTODOのみアクセス可能
+- ✅ **ステータス管理**: TODO/進行中/完了
+- ✅ **優先度設定**: 高/中/低
+- ✅ **期限日設定**: 日付指定での期限管理
+- ✅ **ページネーション**: 大量データの効率的な取得
+- ✅ **セキュリティ**: エンドポイント別アクセス制御・CORS設定
+- ✅ **RESTful API**: 標準的なHTTPメソッドとステータスコード
+- ✅ **バリデーション**: 入力データの検証
+- ✅ **グローバル例外ハンドリング**: 統一されたエラーレスポンス
 
 ## 📋 目次
 1. [クイックスタート](#クイックスタート)
@@ -50,8 +54,23 @@ sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE todoapp TO todoapp;"
 # 3. アプリケーション起動
 mvn spring-boot:run
 
-# 4. 動作確認
-curl http://localhost:8080/api/v1/todos
+# 4. 動作確認（ユーザー登録）
+curl -X POST http://localhost:8080/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "test@example.com",
+    "password": "password123",
+    "firstName": "Test",
+    "lastName": "User"
+  }'
+
+# 5. ログインしてJWTトークン取得
+curl -X POST http://localhost:8080/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "test@example.com",
+    "password": "password123"
+  }'
 ```
 
 アプリケーションは http://localhost:8080 で起動します。
@@ -98,20 +117,49 @@ http://localhost:8080/api/v1
 ```
 
 ### 主要エンドポイント
+
+#### 認証エンドポイント（認証不要）
+| メソッド | エンドポイント | 説明 |
+|---------|---------------|------|
+| POST | `/auth/register` | ユーザー登録 |
+| POST | `/auth/login` | ログイン |
+
+#### TODOエンドポイント（認証必須）
 | メソッド | エンドポイント | 説明 |
 |---------|---------------|------|
 | POST | `/todos` | TODO作成 |
 | GET | `/todos` | TODO一覧取得（ページング） |
 | GET | `/todos/{id}` | TODO取得（ID指定） |
-| GET | `/todos/status/{status}` | ステータス別TODO取得 |
+| GET | `/todos?status={status}` | ステータス別TODO取得 |
 | PUT | `/todos/{id}` | TODO更新 |
 | DELETE | `/todos/{id}` | TODO削除 |
 
+**注意**: TODOエンドポイントにアクセスするには、Authorizationヘッダーに`Bearer {token}`形式でJWTトークンを含める必要があります。
+
 ### リクエスト例
 ```bash
-# TODO作成
+# 1. ユーザー登録
+curl -X POST http://localhost:8080/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "password": "password123",
+    "firstName": "山田",
+    "lastName": "太郎"
+  }'
+
+# 2. ログイン（レスポンスからaccessTokenを取得）
+curl -X POST http://localhost:8080/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "password": "password123"
+  }'
+
+# 3. TODO作成（認証必須）
 curl -X POST http://localhost:8080/api/v1/todos \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -d '{
     "title": "プロジェクト完了",
     "description": "最終レビューと提出",
@@ -119,8 +167,9 @@ curl -X POST http://localhost:8080/api/v1/todos \
     "dueDate": "2024-12-31"
   }'
 
-# TODO一覧取得
-curl "http://localhost:8080/api/v1/todos?page=0&size=10&sort=createdAt,desc"
+# 4. TODO一覧取得（認証必須）
+curl "http://localhost:8080/api/v1/todos?page=0&size=10&sort=createdAt,desc" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 詳細なAPI仕様は [docs/API.md](docs/API.md) を参照してください。
@@ -147,19 +196,23 @@ gh pr create --assignee sasazame
 ```
 src/main/java/com/example/todoapp/
 ├── common/              # 共通コンポーネント
-│   ├── config/         # 設定クラス
+│   ├── config/         # 設定クラス（SecurityConfig等）
 │   ├── exception/      # 例外ハンドリング
-│   └── util/           # ユーティリティ
+│   ├── util/           # ユーティリティ
+│   └── validation/     # バリデーションロジック
 ├── domain/              # ドメイン層
-│   ├── model/          # ドメインモデル
+│   ├── model/          # ドメインモデル（Todo, User等）
 │   └── repository/     # リポジトリインターフェース
 ├── application/         # アプリケーション層
+│   ├── dto/            # アプリケーション層DTO
 │   └── service/        # ビジネスロジック
 ├── infrastructure/      # インフラストラクチャ層
-│   └── persistence/    # データアクセス
+│   ├── persistence/    # データアクセス（JPA実装）
+│   └── security/       # セキュリティ関連（JWT処理等）
 └── presentation/        # プレゼンテーション層
     ├── controller/     # REST コントローラー
-    └── dto/            # データ転送オブジェクト
+    ├── dto/            # API リクエスト/レスポンス DTO
+    └── mapper/         # DTO ↔ ドメインモデル変換
 ```
 
 ## 🧪 テスト
@@ -177,9 +230,15 @@ mvn test jacoco:report
 ```
 
 ### テスト構成
-- **単体テスト**: Service 層のビジネスロジック
-- **統合テスト**: Repository 層のデータアクセス
-- **API テスト**: Controller 層のエンドポイント
+- **単体テスト**: Service 層のビジネスロジック（JUnit 5 + Mockito）
+- **統合テスト**: 認証・認可を含む E2E テスト（SpringBootTest）
+- **API テスト**: Controller 層のエンドポイント（MockMvc）
+- **セキュリティテスト**: JWT認証・アクセス制御のテスト
+
+### テスト環境
+- **データベース**: H2 In-Memory（テスト専用）
+- **設定**: `application-test.yml`での専用設定
+- **マイグレーション**: テスト用Flywayスクリプト
 
 ## 📚 設計資料
 
@@ -206,11 +265,13 @@ mvn test jacoco:report
 ### 主要依存関係
 - **Spring Boot Starter Web** - REST API
 - **Spring Boot Starter Data JPA** - データアクセス
-- **Spring Boot Starter Security** - セキュリティ
+- **Spring Boot Starter Security** - セキュリティ・認証
 - **Spring Boot Starter Validation** - バリデーション
 - **PostgreSQL Driver** - データベース接続
 - **Flyway** - データベースマイグレーション
+- **JJWT** - JWT トークン処理
 - **Lombok** - ボイラープレートコード削減
+- **H2 Database** - テスト用インメモリDB
 
 ### 開発ツール
 - **Spring Boot DevTools** - ホットリロード
@@ -219,16 +280,16 @@ mvn test jacoco:report
 ## 🚧 今後の開発予定
 
 ### 近期予定
-- [ ] JWT 認証・認可機能
-- [ ] カテゴリー機能
-- [ ] 検索・フィルタリング機能
+- [ ] カテゴリー・タグ機能
+- [ ] 検索・フィルタリング機能強化
 - [ ] ファイル添付機能
+- [ ] 通知・リマインダー機能
 
 ### 中長期予定
 - [ ] キャッシュ機能（Redis）
-- [ ] 通知機能
 - [ ] 一括操作 API
 - [ ] OpenAPI ドキュメント自動生成
+- [ ] パフォーマンス監視・メトリクス
 
 ## 📝 ライセンス
 
@@ -249,4 +310,4 @@ mvn test jacoco:report
 ---
 
 **開発者**: sasazame  
-**最終更新**: 2024年5月
+**最終更新**: 2025年5月
