@@ -48,14 +48,11 @@ jobs:
       run: mvn clean test
       env:
         SPRING_PROFILES_ACTIVE: test
-        SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/todoapp_test
-        SPRING_DATASOURCE_USERNAME: todoapp
-        SPRING_DATASOURCE_PASSWORD: todoapp
 
     - name: Run integration tests
       run: mvn verify -Pintegration-test
       env:
-        SPRING_PROFILES_ACTIVE: test
+        SPRING_PROFILES_ACTIVE: ci
         SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/todoapp_test
         SPRING_DATASOURCE_USERNAME: todoapp
         SPRING_DATASOURCE_PASSWORD: todoapp
