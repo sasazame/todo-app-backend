@@ -32,7 +32,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
-@Disabled("Temporarily disabled due to Bean configuration issues")
 class TodoIntegrationTest {
 
     @Autowired
@@ -54,10 +53,10 @@ class TodoIntegrationTest {
             "User"
         );
         
-        MvcResult result = mockMvc.perform(post("/api/v1/auth/register")
+        MvcResult result = mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(registerRequest)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andReturn();
 
         String response = result.getResponse().getContentAsString();
@@ -71,10 +70,10 @@ class TodoIntegrationTest {
             "User"
         );
         
-        MvcResult anotherResult = mockMvc.perform(post("/api/v1/auth/register")
+        MvcResult anotherResult = mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(anotherUserRequest)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andReturn();
 
         String anotherResponse = anotherResult.getResponse().getContentAsString();

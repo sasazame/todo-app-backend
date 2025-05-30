@@ -15,9 +15,6 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: todo-app-backend
     
     services:
       postgres:
@@ -44,13 +41,13 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
         cache: 'maven'
-        cache-dependency-path: 'todo-app-backend/pom.xml'
+        cache-dependency-path: 'pom.xml'
 
     - name: Cache Maven dependencies
       uses: actions/cache@v4
       with:
         path: ~/.m2/repository
-        key: ${{ runner.os }}-maven-${{ hashFiles('todo-app-backend/pom.xml') }}
+        key: ${{ runner.os }}-maven-${{ hashFiles('pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-maven-
 
@@ -68,8 +65,8 @@ jobs:
       with:
         name: Maven Tests
         path: |
-          todo-app-backend/target/surefire-reports/*.xml
-          todo-app-backend/target/failsafe-reports/*.xml
+          target/surefire-reports/*.xml
+          target/failsafe-reports/*.xml
         reporter: java-junit
 
     - name: Generate coverage report
@@ -78,7 +75,7 @@ jobs:
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
       with:
-        file: todo-app-backend/target/site/jacoco/jacoco.xml
+        file: target/site/jacoco/jacoco.xml
         flags: backend
         name: backend-coverage
         fail_ci_if_error: false
@@ -89,16 +86,13 @@ jobs:
       with:
         name: test-results
         path: |
-          todo-app-backend/target/surefire-reports/
-          todo-app-backend/target/failsafe-reports/
-          todo-app-backend/target/site/jacoco/
+          target/surefire-reports/
+          target/failsafe-reports/
+          target/site/jacoco/
 
   build:
     runs-on: ubuntu-latest
     needs: test
-    defaults:
-      run:
-        working-directory: todo-app-backend
     
     steps:
     - name: Checkout code
@@ -110,7 +104,7 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
         cache: 'maven'
-        cache-dependency-path: 'todo-app-backend/pom.xml'
+        cache-dependency-path: 'pom.xml'
 
     - name: Build application
       run: mvn clean package -DskipTests
@@ -119,15 +113,12 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: jar-artifact
-        path: todo-app-backend/target/*.jar
+        path: target/*.jar
         retention-days: 7
 
   security-scan:
     runs-on: ubuntu-latest
     needs: test
-    defaults:
-      run:
-        working-directory: todo-app-backend
     
     steps:
     - name: Checkout code
@@ -139,7 +130,7 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
         cache: 'maven'
-        cache-dependency-path: 'todo-app-backend/pom.xml'
+        cache-dependency-path: 'pom.xml'
 
     - name: Run OWASP Dependency Check
       run: mvn org.owasp:dependency-check-maven:check
@@ -150,14 +141,11 @@ jobs:
       if: always()
       with:
         name: dependency-check-report
-        path: todo-app-backend/target/dependency-check-report.html
+        path: target/dependency-check-report.html
 
   code-quality:
     runs-on: ubuntu-latest
     needs: test
-    defaults:
-      run:
-        working-directory: todo-app-backend
     
     steps:
     - name: Checkout code
@@ -169,7 +157,7 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
         cache: 'maven'
-        cache-dependency-path: 'todo-app-backend/pom.xml'
+        cache-dependency-path: 'pom.xml'
 
     - name: Run SpotBugs
       run: mvn com.github.spotbugs:spotbugs-maven-plugin:spotbugs
@@ -185,5 +173,5 @@ jobs:
       with:
         name: code-quality-reports
         path: |
-          todo-app-backend/target/spotbugs.xml
-          todo-app-backend/target/pmd.xml
+          target/spotbugs.xml
+          target/pmd.xml
