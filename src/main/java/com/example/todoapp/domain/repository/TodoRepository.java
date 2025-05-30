@@ -54,4 +54,14 @@ public interface TodoRepository {
      * IDでTODOが存在するか確認する
      */
     boolean existsById(Long id);
+    
+    /**
+     * ユーザーIDでTODOを検索する（ページング）
+     */
+    Page<TodoEntity> findByUserId(Long userId, Pageable pageable);
+    
+    /**
+     * ユーザーIDとステータスでTODOを検索する
+     */
+    List<TodoEntity> findByUserIdAndStatus(Long userId, TodoStatus status);
 }

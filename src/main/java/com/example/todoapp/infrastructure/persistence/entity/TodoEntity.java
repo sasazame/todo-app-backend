@@ -38,6 +38,9 @@ public class TodoEntity {
     @Column(name = "due_date")
     private LocalDate dueDate;
 
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private ZonedDateTime createdAt;
@@ -51,12 +54,13 @@ public class TodoEntity {
     }
 
     public TodoEntity(String title, String description, TodoStatus status, 
-                      TodoPriority priority, LocalDate dueDate) {
+                      TodoPriority priority, LocalDate dueDate, Long userId) {
         this.title = title;
         this.description = description;
         this.status = status;
         this.priority = priority;
         this.dueDate = dueDate;
+        this.userId = userId;
     }
 
     // Getters and Setters
@@ -106,6 +110,14 @@ public class TodoEntity {
 
     public void setDueDate(LocalDate dueDate) {
         this.dueDate = dueDate;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public ZonedDateTime getCreatedAt() {

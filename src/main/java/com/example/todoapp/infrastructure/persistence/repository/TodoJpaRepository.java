@@ -3,6 +3,8 @@ package com.example.todoapp.infrastructure.persistence.repository;
 import com.example.todoapp.domain.model.TodoPriority;
 import com.example.todoapp.domain.model.TodoStatus;
 import com.example.todoapp.infrastructure.persistence.entity.TodoEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -38,4 +40,19 @@ public interface TodoJpaRepository extends JpaRepository<TodoEntity, Long> {
      * タイトルに部分一致するTODOを検索する
      */
     List<TodoEntity> findByTitleContainingIgnoreCaseOrderByCreatedAtDesc(String keyword);
+    
+    /**
+     * ユーザーIDでTODOを検索する
+     */
+    List<TodoEntity> findByUserIdOrderByCreatedAtDesc(Long userId);
+    
+    /**
+     * ユーザーIDとステータスでTODOを検索する
+     */
+    List<TodoEntity> findByUserIdAndStatusOrderByCreatedAtDesc(Long userId, TodoStatus status);
+    
+    /**
+     * ユーザーIDでTODOを検索する（ページング）
+     */
+    Page<TodoEntity> findByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
 }
