@@ -3,6 +3,8 @@ package com.example.todoapp.common.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -77,6 +79,67 @@ public class GlobalExceptionHandler {
         );
         
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    /**
+     * 認証失敗（パスワード間違いなど）
+     */
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentialsException(BadCredentialsException e) {
+        log.warn("Authentication failed: {}", e.getMessage());
+        
+        ErrorResponse errorResponse = new ErrorResponse(
+            "AUTHENTICATION_FAILED",
+            "認証に失敗しました",
+            ZonedDateTime.now()
+        );
+        
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+    }
+
+    /**
+     * アクセス権限不足
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException e) {
+        log.warn("Access denied: {}", e.getMessage());
+        
+        ErrorResponse errorResponse = new ErrorResponse(
+            "ACCESS_DENIED",
+            "アクセス権限がありません",
+            ZonedDateTime.now()
+        );
+        
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+    }
+
+    /**
+     * 重複ユーザー登録エラー
+     */
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException e) {
+        if (e.getMessage() != null && e.getMessage().contains("Email already exists")) {
+            log.warn("Duplicate email registration attempt: {}", e.getMessage());
+            
+            ErrorResponse errorResponse = new ErrorResponse(
+                "EMAIL_ALREADY_EXISTS",
+                "このメールアドレスは既に使用されています",
+                ZonedDateTime.now()
+            );
+            
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+        }
+        
+        // その他のRuntimeExceptionは500エラーとして処理
+        log.error("Unexpected runtime error occurred", e);
+        
+        ErrorResponse errorResponse = new ErrorResponse(
+            "INTERNAL_SERVER_ERROR",
+            "サーバーエラーが発生しました",
+            ZonedDateTime.now()
+        );
+        
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 
     /**

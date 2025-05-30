@@ -9,6 +9,7 @@ import com.example.todoapp.presentation.dto.request.UpdateTodoRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Disabled;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -52,10 +53,10 @@ class TodoIntegrationTest {
             "User"
         );
         
-        MvcResult result = mockMvc.perform(post("/api/v1/auth/register")
+        MvcResult result = mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(registerRequest)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andReturn();
 
         String response = result.getResponse().getContentAsString();
@@ -69,10 +70,10 @@ class TodoIntegrationTest {
             "User"
         );
         
-        MvcResult anotherResult = mockMvc.perform(post("/api/v1/auth/register")
+        MvcResult anotherResult = mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(anotherUserRequest)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andReturn();
 
         String anotherResponse = anotherResult.getResponse().getContentAsString();

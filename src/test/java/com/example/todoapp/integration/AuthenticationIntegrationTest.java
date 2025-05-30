@@ -5,6 +5,7 @@ import com.example.todoapp.presentation.dto.request.RegisterRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Disabled;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -52,11 +53,11 @@ class AuthenticationIntegrationTest {
 
     @Test
     void shouldAllowAccessToRegistrationEndpointWithoutAuthentication() throws Exception {
-        mockMvc.perform(post("/api/v1/auth/register")
+        mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(validRegisterRequest)))
                 .andDo(print())
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.email").value("test@example.com"))
                 .andExpect(jsonPath("$.accessToken").exists());
     }
@@ -64,13 +65,13 @@ class AuthenticationIntegrationTest {
     @Test
     void shouldAllowAccessToLoginEndpointWithoutAuthentication() throws Exception {
         // First register the user
-        mockMvc.perform(post("/api/v1/auth/register")
+        mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(validRegisterRequest)))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         // Then login
-        mockMvc.perform(post("/api/v1/auth/login")
+        mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(validLoginRequest)))
                 .andDo(print())
@@ -88,7 +89,7 @@ class AuthenticationIntegrationTest {
             "" // Invalid: empty last name
         );
 
-        mockMvc.perform(post("/api/v1/auth/register")
+        mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andDo(print())
@@ -98,10 +99,10 @@ class AuthenticationIntegrationTest {
     @Test
     void shouldReturnUnauthorizedForInvalidCredentials() throws Exception {
         // First register the user
-        mockMvc.perform(post("/api/v1/auth/register")
+        mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(validRegisterRequest)))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         // Try to login with wrong password
         LoginRequest invalidLogin = new LoginRequest(
@@ -109,7 +110,7 @@ class AuthenticationIntegrationTest {
             "WrongPassword123!"
         );
 
-        mockMvc.perform(post("/api/v1/auth/login")
+        mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(invalidLogin)))
                 .andDo(print())
@@ -119,13 +120,13 @@ class AuthenticationIntegrationTest {
     @Test
     void shouldReturnConflictWhenRegisteringExistingUser() throws Exception {
         // Register user first time
-        mockMvc.perform(post("/api/v1/auth/register")
+        mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(validRegisterRequest)))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         // Try to register same user again
-        mockMvc.perform(post("/api/v1/auth/register")
+        mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(validRegisterRequest)))
                 .andDo(print())
@@ -134,7 +135,7 @@ class AuthenticationIntegrationTest {
 
     @Test
     void shouldHandleCorsHeadersForAuthEndpoints() throws Exception {
-        mockMvc.perform(options("/api/v1/auth/register")
+        mockMvc.perform(options("/api/auth/register")
                 .header("Origin", "http://localhost:3000")
                 .header("Access-Control-Request-Method", "POST")
                 .header("Access-Control-Request-Headers", "Content-Type"))
