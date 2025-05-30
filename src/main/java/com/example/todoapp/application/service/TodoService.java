@@ -39,12 +39,12 @@ public class TodoService {
         Long currentUserId = userContextService.getCurrentUserId();
         
         TodoEntity todo = new TodoEntity(
+            currentUserId,
             request.title(),
             request.description(),
             TodoStatus.TODO,
             request.priority(),
-            request.dueDate(),
-            currentUserId
+            request.dueDate()
         );
         
         TodoEntity saved = todoRepository.save(todo);

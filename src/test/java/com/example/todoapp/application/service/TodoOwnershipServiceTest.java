@@ -55,12 +55,12 @@ class TodoOwnershipServiceTest {
         );
 
         TodoEntity savedTodo = new TodoEntity(
+                currentUserId,
                 "Test Todo",
                 "Test Description",
                 TodoStatus.TODO,
                 TodoPriority.HIGH,
-                LocalDate.now().plusDays(1),
-                currentUserId
+                LocalDate.now().plusDays(1)
         );
         savedTodo.setId(1L);
         savedTodo.setCreatedAt(ZonedDateTime.now());
@@ -84,12 +84,12 @@ class TodoOwnershipServiceTest {
         Long currentUserId = 1L;
 
         TodoEntity todo = new TodoEntity(
+                currentUserId,
                 "Test Todo",
                 "Test Description",
                 TodoStatus.TODO,
                 TodoPriority.HIGH,
-                LocalDate.now().plusDays(1),
-                currentUserId
+                LocalDate.now().plusDays(1)
         );
         todo.setId(todoId);
 
@@ -111,12 +111,12 @@ class TodoOwnershipServiceTest {
         Long currentUserId = 2L;
 
         TodoEntity todo = new TodoEntity(
+                todoOwnerId,
                 "Test Todo",
                 "Test Description",
                 TodoStatus.TODO,
                 TodoPriority.HIGH,
-                LocalDate.now().plusDays(1),
-                todoOwnerId
+                LocalDate.now().plusDays(1)
         );
         todo.setId(todoId);
 
@@ -137,22 +137,22 @@ class TodoOwnershipServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         TodoEntity todo1 = new TodoEntity(
+                currentUserId,
                 "Todo 1",
                 "Description 1",
                 TodoStatus.TODO,
                 TodoPriority.HIGH,
-                LocalDate.now(),
-                currentUserId
+                LocalDate.now()
         );
         todo1.setId(1L);
 
         TodoEntity todo2 = new TodoEntity(
+                currentUserId,
                 "Todo 2",
                 "Description 2",
                 TodoStatus.DONE,
                 TodoPriority.LOW,
-                LocalDate.now(),
-                currentUserId
+                LocalDate.now()
         );
         todo2.setId(2L);
 
@@ -177,12 +177,12 @@ class TodoOwnershipServiceTest {
         TodoStatus status = TodoStatus.TODO;
 
         TodoEntity todo = new TodoEntity(
+                currentUserId,
                 "Todo 1",
                 "Description 1",
                 TodoStatus.TODO,
                 TodoPriority.HIGH,
-                LocalDate.now(),
-                currentUserId
+                LocalDate.now()
         );
         todo.setId(1L);
 
@@ -204,12 +204,12 @@ class TodoOwnershipServiceTest {
         Long currentUserId = 1L;
 
         TodoEntity existingTodo = new TodoEntity(
+                currentUserId,
                 "Old Title",
                 "Old Description",
                 TodoStatus.TODO,
                 TodoPriority.LOW,
-                LocalDate.now(),
-                currentUserId
+                LocalDate.now()
         );
         existingTodo.setId(todoId);
 
@@ -240,12 +240,12 @@ class TodoOwnershipServiceTest {
         Long currentUserId = 2L;
 
         TodoEntity existingTodo = new TodoEntity(
+                todoOwnerId,
                 "Old Title",
                 "Old Description",
                 TodoStatus.TODO,
                 TodoPriority.LOW,
-                LocalDate.now(),
-                todoOwnerId
+                LocalDate.now()
         );
         existingTodo.setId(todoId);
 
@@ -275,12 +275,12 @@ class TodoOwnershipServiceTest {
         Long currentUserId = 1L;
 
         TodoEntity existingTodo = new TodoEntity(
+                currentUserId,
                 "Title",
                 "Description",
                 TodoStatus.TODO,
                 TodoPriority.LOW,
-                LocalDate.now(),
-                currentUserId
+                LocalDate.now()
         );
         existingTodo.setId(todoId);
 
@@ -301,12 +301,12 @@ class TodoOwnershipServiceTest {
         Long currentUserId = 2L;
 
         TodoEntity existingTodo = new TodoEntity(
+                todoOwnerId,
                 "Title",
                 "Description",
                 TodoStatus.TODO,
                 TodoPriority.LOW,
-                LocalDate.now(),
-                todoOwnerId
+                LocalDate.now()
         );
         existingTodo.setId(todoId);
 
