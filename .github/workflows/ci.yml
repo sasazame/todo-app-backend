@@ -11,26 +11,12 @@ permissions:
   issues: write
   pull-requests: write
   checks: write
+  actions: read
 
 jobs:
   test:
     runs-on: ubuntu-latest
     
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_DB: todoapp_test
-          POSTGRES_USER: todoapp
-          POSTGRES_PASSWORD: todoapp
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -55,9 +41,6 @@ jobs:
       run: mvn clean verify -Dmaven.test.failure.ignore=true
       env:
         SPRING_PROFILES_ACTIVE: test
-        SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/todoapp_test
-        SPRING_DATASOURCE_USERNAME: todoapp
-        SPRING_DATASOURCE_PASSWORD: todoapp
 
     - name: Generate test report
       uses: dorny/test-reporter@v1
