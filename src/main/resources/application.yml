@@ -53,6 +53,12 @@ server:
     include-message: always
     include-binding-errors: always
 
+app:
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET_KEY:your-secret-key-that-is-at-least-256-bits-long-for-HS256-algorithm-security}
+      expiration: ${JWT_EXPIRATION:86400000} # 24 hours in milliseconds
+
 management:
   endpoints:
     web:
