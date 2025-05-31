@@ -41,8 +41,7 @@ public class UserRepositoryImpl implements UserRepository {
                 entity.getId(),
                 entity.getEmail(),
                 entity.getPassword(),
-                entity.getFirstName(),
-                entity.getLastName(),
+                entity.getUsername(),
                 entity.isEnabled(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt()
@@ -54,8 +53,7 @@ public class UserRepositoryImpl implements UserRepository {
         entity.setId(user.getId());
         entity.setEmail(user.getEmail());
         entity.setPassword(user.getPassword());
-        entity.setFirstName(user.getFirstName());
-        entity.setLastName(user.getLastName());
+        entity.setUsername(user.getUsername());
         entity.setEnabled(user.isEnabled());
         entity.setCreatedAt(user.getCreatedAt());
         entity.setUpdatedAt(user.getUpdatedAt());

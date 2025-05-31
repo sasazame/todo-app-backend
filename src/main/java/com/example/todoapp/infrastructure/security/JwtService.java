@@ -44,6 +44,10 @@ public class JwtService {
         return buildToken(extraClaims, userDetails, tokenExpiration);
     }
 
+    public String generateRefreshToken(UserDetails userDetails) {
+        return buildToken(new HashMap<>(), userDetails, Duration.ofDays(7));
+    }
+
     private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, Duration expiration) {
         Instant now = Instant.now();
         return Jwts.builder()
