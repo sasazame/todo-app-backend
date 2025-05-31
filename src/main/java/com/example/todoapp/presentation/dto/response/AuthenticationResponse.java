@@ -10,15 +10,17 @@ import lombok.NoArgsConstructor;
 public class AuthenticationResponse {
     
     private String accessToken;
-    private String tokenType = "Bearer";
-    private String email;
-    private String firstName;
-    private String lastName;
+    private String refreshToken;
+    private UserResponse user;
 
-    public AuthenticationResponse(String accessToken, String email, String firstName, String lastName) {
-        this.accessToken = accessToken;
-        this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UserResponse {
+        private Long id;
+        private String username;
+        private String email;
+        private String createdAt;
+        private String updatedAt;
     }
 }

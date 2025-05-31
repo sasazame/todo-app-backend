@@ -33,8 +33,7 @@ public class AuthenticationService {
         User user = new User();
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
+        user.setUsername(request.getUsername());
         user.setEnabled(true);
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
@@ -47,14 +46,18 @@ public class AuthenticationService {
                 .authorities(new ArrayList<>())
                 .build();
 
-        String token = jwtService.generateToken(userDetails);
+        String accessToken = jwtService.generateToken(userDetails);
+        String refreshToken = jwtService.generateRefreshToken(userDetails);
 
-        return new AuthenticationResponse(
-                token,
+        AuthenticationResponse.UserResponse userResponse = new AuthenticationResponse.UserResponse(
+                savedUser.getId(),
+                savedUser.getUsername(),
                 savedUser.getEmail(),
-                savedUser.getFirstName(),
-                savedUser.getLastName()
+                savedUser.getCreatedAt().toString(),
+                savedUser.getUpdatedAt().toString()
         );
+
+        return new AuthenticationResponse(accessToken, refreshToken, userResponse);
     }
 
     public AuthenticationResponse login(LoginRequest request) {
@@ -74,13 +77,17 @@ public class AuthenticationService {
                 .authorities(new ArrayList<>())
                 .build();
 
-        String token = jwtService.generateToken(userDetails);
+        String accessToken = jwtService.generateToken(userDetails);
+        String refreshToken = jwtService.generateRefreshToken(userDetails);
 
-        return new AuthenticationResponse(
-                token,
+        AuthenticationResponse.UserResponse userResponse = new AuthenticationResponse.UserResponse(
+                user.getId(),
+                user.getUsername(),
                 user.getEmail(),
-                user.getFirstName(),
-                user.getLastName()
+                user.getCreatedAt().toString(),
+                user.getUpdatedAt().toString()
         );
+
+        return new AuthenticationResponse(accessToken, refreshToken, userResponse);
     }
 }
