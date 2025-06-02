@@ -55,4 +55,14 @@ public interface TodoJpaRepository extends JpaRepository<TodoEntity, Long> {
      * ユーザーIDでTODOを検索する（ページング）
      */
     Page<TodoEntity> findByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
+    
+    /**
+     * ユーザーIDですべてのTODOを削除する
+     */
+    void deleteByUserId(Long userId);
+    
+    /**
+     * 親タスクIDで子タスクを検索する
+     */
+    List<TodoEntity> findByParentIdOrderByCreatedAtDesc(Long parentId);
 }

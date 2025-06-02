@@ -46,14 +46,12 @@ class TodoIntegrationTest {
     @BeforeEach
     void setUp() throws Exception {
         // Create first user and get token
-        RegisterRequest registerRequest = new RegisterRequest(
-            "test@example.com",
-            "Password123!",
-            "Test",
-            "User"
-        );
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setEmail("test@example.com");
+        registerRequest.setPassword("Password123!");
+        registerRequest.setUsername("testuser");
         
-        MvcResult result = mockMvc.perform(post("/api/auth/register")
+        MvcResult result = mockMvc.perform(post("/api/v1/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isCreated())
@@ -63,14 +61,12 @@ class TodoIntegrationTest {
         authToken = objectMapper.readTree(response).get("accessToken").asText();
 
         // Create another user for access control tests
-        RegisterRequest anotherUserRequest = new RegisterRequest(
-            "another@example.com",
-            "Password123!",
-            "Another",
-            "User"
-        );
+        RegisterRequest anotherUserRequest = new RegisterRequest();
+        anotherUserRequest.setEmail("another@example.com");
+        anotherUserRequest.setPassword("Password123!");
+        anotherUserRequest.setUsername("anotheruser");
         
-        MvcResult anotherResult = mockMvc.perform(post("/api/auth/register")
+        MvcResult anotherResult = mockMvc.perform(post("/api/v1/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(anotherUserRequest)))
                 .andExpect(status().isCreated())
@@ -109,7 +105,8 @@ class TodoIntegrationTest {
             "Test Todo",
             "Test Description",
             TodoPriority.HIGH,
-            LocalDate.now().plusDays(7)
+            LocalDate.now().plusDays(7),
+            null
         );
 
         mockMvc.perform(post("/api/v1/todos")
@@ -131,7 +128,8 @@ class TodoIntegrationTest {
             "User1 Todo",
             "Description",
             TodoPriority.MEDIUM,
-            LocalDate.now().plusDays(1)
+            LocalDate.now().plusDays(1),
+            null
         );
 
         mockMvc.perform(post("/api/v1/todos")
@@ -145,7 +143,8 @@ class TodoIntegrationTest {
             "User2 Todo",
             "Another Description",
             TodoPriority.LOW,
-            LocalDate.now().plusDays(2)
+            LocalDate.now().plusDays(2),
+            null
         );
 
         mockMvc.perform(post("/api/v1/todos")
@@ -177,7 +176,8 @@ class TodoIntegrationTest {
             "Private Todo",
             "Private Description",
             TodoPriority.HIGH,
-            LocalDate.now()
+            LocalDate.now(),
+            null
         );
 
         MvcResult result = mockMvc.perform(post("/api/v1/todos")
@@ -202,7 +202,8 @@ class TodoIntegrationTest {
             "Hacked Description",
             TodoStatus.DONE,
             TodoPriority.LOW,
-            LocalDate.now()
+            LocalDate.now(),
+            null
         );
 
         mockMvc.perform(put("/api/v1/todos/" + todoId)
@@ -224,7 +225,8 @@ class TodoIntegrationTest {
             "Original Title",
             "Original Description",
             TodoPriority.LOW,
-            LocalDate.now().plusDays(3)
+            LocalDate.now().plusDays(3),
+            null
         );
 
         MvcResult createResult = mockMvc.perform(post("/api/v1/todos")
@@ -243,7 +245,8 @@ class TodoIntegrationTest {
             "Updated Description",
             TodoStatus.IN_PROGRESS,
             TodoPriority.HIGH,
-            LocalDate.now().plusDays(5)
+            LocalDate.now().plusDays(5),
+            null
         );
 
         mockMvc.perform(put("/api/v1/todos/" + todoId)
@@ -265,7 +268,8 @@ class TodoIntegrationTest {
             "To Be Deleted",
             "This will be deleted",
             TodoPriority.MEDIUM,
-            LocalDate.now()
+            LocalDate.now(),
+            null
         );
 
         MvcResult createResult = mockMvc.perform(post("/api/v1/todos")
@@ -297,14 +301,16 @@ class TodoIntegrationTest {
             "Todo 1",
             "Description 1",
             TodoPriority.HIGH,
-            LocalDate.now()
+            LocalDate.now(),
+            null
         );
 
         CreateTodoRequest todo2 = new CreateTodoRequest(
             "Todo 2",
             "Description 2",
             TodoPriority.MEDIUM,
-            LocalDate.now()
+            LocalDate.now(),
+            null
         );
 
         // Create first todo
@@ -331,7 +337,8 @@ class TodoIntegrationTest {
             "Description 2",
             TodoStatus.DONE,
             TodoPriority.MEDIUM,
-            LocalDate.now()
+            LocalDate.now(),
+            null
         );
 
         mockMvc.perform(put("/api/v1/todos/" + todoId)

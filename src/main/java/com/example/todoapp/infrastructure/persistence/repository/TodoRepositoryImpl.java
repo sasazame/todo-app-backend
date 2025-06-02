@@ -71,4 +71,14 @@ public class TodoRepositoryImpl implements TodoRepository {
     public List<TodoEntity> findByUserIdAndStatus(Long userId, TodoStatus status) {
         return todoJpaRepository.findByUserIdAndStatusOrderByCreatedAtDesc(userId, status);
     }
+    
+    @Override
+    public void deleteByUserId(Long userId) {
+        todoJpaRepository.deleteByUserId(userId);
+    }
+    
+    @Override
+    public List<TodoEntity> findByParentId(Long parentId) {
+        return todoJpaRepository.findByParentIdOrderByCreatedAtDesc(parentId);
+    }
 }

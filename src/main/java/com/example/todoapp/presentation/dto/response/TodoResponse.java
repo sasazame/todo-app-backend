@@ -17,6 +17,7 @@ public record TodoResponse(
     TodoStatus status,
     TodoPriority priority,
     LocalDate dueDate,
+    Long parentId,
     ZonedDateTime createdAt,
     ZonedDateTime updatedAt
 ) {
@@ -31,6 +32,7 @@ public record TodoResponse(
             entity.getStatus(),
             entity.getPriority(),
             entity.getDueDate(),
+            entity.getParentId(),
             entity.getCreatedAt(),
             entity.getUpdatedAt()
         );

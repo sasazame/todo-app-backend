@@ -25,5 +25,7 @@ public record UpdateTodoRequest(
     @NotNull(message = "優先度は必須です")
     TodoPriority priority,
     
-    LocalDate dueDate
+    LocalDate dueDate,
+    
+    Long parentId
 ) {}

@@ -48,8 +48,7 @@ class UserContextServiceTest {
                 1L,
                 "test@example.com",
                 "password",
-                "John",
-                "Doe",
+                "testuser",
                 true,
                 LocalDateTime.now(),
                 LocalDateTime.now()
@@ -116,8 +115,7 @@ class UserContextServiceTest {
                 1L,
                 "test@example.com",
                 "password",
-                "John",
-                "Doe",
+                "testuser",
                 true,
                 LocalDateTime.now(),
                 LocalDateTime.now()
@@ -140,8 +138,7 @@ class UserContextServiceTest {
                 1L,
                 "test@example.com",
                 "password",
-                "John",
-                "Doe",
+                "testuser",
                 true,
                 LocalDateTime.now(),
                 LocalDateTime.now()
@@ -164,8 +161,7 @@ class UserContextServiceTest {
                 1L,
                 "test@example.com",
                 "password",
-                "John",
-                "Doe",
+                "testuser",
                 true,
                 LocalDateTime.now(),
                 LocalDateTime.now()

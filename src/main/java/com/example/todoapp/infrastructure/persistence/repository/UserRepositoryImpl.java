@@ -36,6 +36,21 @@ public class UserRepositoryImpl implements UserRepository {
         return userJpaRepository.findById(id).map(this::toModel);
     }
 
+    @Override
+    public boolean existsByUsername(String username) {
+        return userJpaRepository.existsByUsername(username);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        userJpaRepository.deleteById(id);
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return userJpaRepository.findByUsername(username).map(this::toModel);
+    }
+
     private User toModel(UserEntity entity) {
         return new User(
                 entity.getId(),

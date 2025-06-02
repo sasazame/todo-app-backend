@@ -19,7 +19,9 @@ public record CreateTodoRequest(
     
     TodoPriority priority,
     
-    LocalDate dueDate
+    LocalDate dueDate,
+    
+    Long parentId
 ) {
     public CreateTodoRequest {
         // デフォルト値の設定

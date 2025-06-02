@@ -92,4 +92,14 @@ public class TodoController {
         todoService.deleteTodo(id);
         return ResponseEntity.noContent().build();
     }
+    
+    /**
+     * 子タスク一覧取得
+     */
+    @GetMapping("/{parentId}/children")
+    public ResponseEntity<List<TodoResponse>> getChildTasks(@PathVariable Long parentId) {
+        log.info("GET /api/v1/todos/{}/children - Getting child tasks", parentId);
+        List<TodoResponse> response = todoService.getChildTasks(parentId);
+        return ResponseEntity.ok(response);
+    }
 }

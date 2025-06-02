@@ -6,6 +6,7 @@ import com.example.todoapp.domain.model.User;
 import com.example.todoapp.presentation.dto.request.LoginRequest;
 import com.example.todoapp.presentation.dto.request.RegisterRequest;
 import com.example.todoapp.presentation.dto.response.AuthenticationResponse;
+import com.example.todoapp.presentation.dto.response.UserResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -37,15 +38,15 @@ public class AuthenticationController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<AuthenticationResponse.UserResponse> getCurrentUser() {
+    public ResponseEntity<UserResponse> getCurrentUser() {
         User currentUser = userContextService.getCurrentUser();
         
-        AuthenticationResponse.UserResponse userResponse = new AuthenticationResponse.UserResponse(
+        UserResponse userResponse = new UserResponse(
                 currentUser.getId(),
                 currentUser.getUsername(),
                 currentUser.getEmail(),
-                currentUser.getCreatedAt().toString(),
-                currentUser.getUpdatedAt().toString()
+                currentUser.getCreatedAt(),
+                currentUser.getUpdatedAt()
         );
         
         return ResponseEntity.ok(userResponse);
