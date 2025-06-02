@@ -55,20 +55,23 @@ POST /api/v1/auth/register
 ```json
 {
   "email": "user@example.com",
-  "password": "password123",
-  "firstName": "太郎",
-  "lastName": "山田"
+  "password": "SecurePass123!",
+  "username": "testuser"
 }
 ```
 
-**レスポンス** (200 OK):
+**レスポンス** (201 Created):
 ```json
 {
   "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "tokenType": "Bearer",
-  "email": "user@example.com",
-  "firstName": "太郎",
-  "lastName": "山田"
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": 1,
+    "username": "testuser",
+    "email": "user@example.com",
+    "createdAt": "2024-01-01T09:00:00+09:00",
+    "updatedAt": "2024-01-01T09:00:00+09:00"
+  }
 }
 ```
 
@@ -98,10 +101,14 @@ POST /api/v1/auth/login
 ```json
 {
   "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "tokenType": "Bearer",
-  "email": "user@example.com",
-  "firstName": "太郎",
-  "lastName": "山田"
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": 1,
+    "username": "testuser",
+    "email": "user@example.com",
+    "createdAt": "2024-01-01T09:00:00+09:00",
+    "updatedAt": "2024-01-01T09:00:00+09:00"
+  }
 }
 ```
 
@@ -114,9 +121,26 @@ POST /api/v1/auth/login
 }
 ```
 
+### 3. 現在のユーザー情報取得
+```
+GET /api/v1/auth/me
+Authorization: Bearer <JWT_TOKEN>
+```
+
+**レスポンス** (200 OK):
+```json
+{
+  "id": 1,
+  "username": "testuser",
+  "email": "user@example.com",
+  "createdAt": "2024-01-01T09:00:00+09:00",
+  "updatedAt": "2024-01-01T09:00:00+09:00"
+}
+```
+
 ## 🔒 TODOエンドポイント（認証必須）
 
-### 3. TODO作成
+### 4. TODO作成
 ```
 POST /api/v1/todos
 Authorization: Bearer <JWT_TOKEN>
@@ -128,7 +152,8 @@ Authorization: Bearer <JWT_TOKEN>
   "title": "サンプルTODO",
   "description": "詳細説明（任意）",
   "priority": "HIGH",
-  "dueDate": "2024-12-31"
+  "dueDate": "2024-12-31",
+  "parentId": null
 }
 ```
 
@@ -141,6 +166,7 @@ Authorization: Bearer <JWT_TOKEN>
   "status": "TODO",
   "priority": "HIGH",
   "dueDate": "2024-12-31",
+  "parentId": null,
   "createdAt": "2024-01-01T09:00:00+09:00",
   "updatedAt": "2024-01-01T09:00:00+09:00"
 }
@@ -148,7 +174,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 **注意**: 作成されたTODOは認証済みユーザーに自動的に関連付けられます。
 
-### 4. TODO取得（ID指定）
+### 5. TODO取得（ID指定）
 ```
 GET /api/v1/todos/{id}
 Authorization: Bearer <JWT_TOKEN>
@@ -166,6 +192,7 @@ Authorization: Bearer <JWT_TOKEN>
   "status": "TODO",
   "priority": "HIGH",
   "dueDate": "2024-12-31",
+  "parentId": null,
   "createdAt": "2024-01-01T09:00:00+09:00",
   "updatedAt": "2024-01-01T09:00:00+09:00"
 }
@@ -180,7 +207,7 @@ Authorization: Bearer <JWT_TOKEN>
 }
 ```
 
-### 5. TODO一覧取得
+### 6. TODO一覧取得
 ```
 GET /api/v1/todos
 Authorization: Bearer <JWT_TOKEN>
@@ -203,6 +230,7 @@ Authorization: Bearer <JWT_TOKEN>
       "status": "TODO",
       "priority": "HIGH",
       "dueDate": "2024-12-31",
+      "parentId": null,
       "createdAt": "2024-01-01T09:00:00+09:00",
       "updatedAt": "2024-01-01T09:00:00+09:00"
     }
@@ -223,13 +251,13 @@ Authorization: Bearer <JWT_TOKEN>
 }
 ```
 
-### 6. ステータス別TODO取得
+### 7. ステータス別TODO取得
 ```
-GET /api/v1/todos?status={status}
+GET /api/v1/todos/status/{status}
 Authorization: Bearer <JWT_TOKEN>
 ```
 
-**クエリパラメータ**:
+**パスパラメータ**:
 - `status`: TODO, IN_PROGRESS, DONE
 
 **レスポンス** (200 OK):
@@ -243,13 +271,14 @@ Authorization: Bearer <JWT_TOKEN>
     "status": "IN_PROGRESS",
     "priority": "HIGH",
     "dueDate": "2024-12-31",
+    "parentId": null,
     "createdAt": "2024-01-01T09:00:00+09:00",
     "updatedAt": "2024-01-01T10:00:00+09:00"
   }
 ]
 ```
 
-### 7. TODO更新
+### 8. TODO更新
 ```
 PUT /api/v1/todos/{id}
 Authorization: Bearer <JWT_TOKEN>
@@ -278,6 +307,7 @@ Authorization: Bearer <JWT_TOKEN>
   "status": "IN_PROGRESS",
   "priority": "MEDIUM",
   "dueDate": "2024-12-25",
+  "parentId": null,
   "createdAt": "2024-01-01T09:00:00+09:00",
   "updatedAt": "2024-01-01T11:00:00+09:00"
 }
@@ -292,7 +322,7 @@ Authorization: Bearer <JWT_TOKEN>
 }
 ```
 
-### 8. TODO削除
+### 9. TODO削除
 ```
 DELETE /api/v1/todos/{id}
 Authorization: Bearer <JWT_TOKEN>
@@ -313,6 +343,117 @@ Authorization: Bearer <JWT_TOKEN>
 }
 ```
 
+### 10. 子タスク一覧取得
+```
+GET /api/v1/todos/{parentId}/children
+Authorization: Bearer <JWT_TOKEN>
+```
+
+**パスパラメータ**:
+- `parentId`: 親TODO ID (Long)
+
+**レスポンス** (200 OK):
+認証済みユーザーの指定された親TODOの子タスクが返されます。
+```json
+[
+  {
+    "id": 2,
+    "title": "子タスク1",
+    "description": "詳細説明",
+    "status": "TODO",
+    "priority": "MEDIUM",
+    "dueDate": "2024-12-31",
+    "parentId": 1,
+    "createdAt": "2024-01-01T09:30:00+09:00",
+    "updatedAt": "2024-01-01T09:30:00+09:00"
+  }
+]
+```
+
+## 🔒 ユーザー管理エンドポイント（認証必須）
+
+### 11. ユーザー情報取得
+```
+GET /api/v1/users/{id}
+Authorization: Bearer <JWT_TOKEN>
+```
+
+**パスパラメータ**:
+- `id`: ユーザー ID (Long)
+
+**レスポンス** (200 OK):
+```json
+{
+  "id": 1,
+  "username": "testuser",
+  "email": "user@example.com",
+  "createdAt": "2024-01-01T09:00:00+09:00",
+  "updatedAt": "2024-01-01T09:00:00+09:00"
+}
+```
+
+### 12. ユーザー情報更新
+```
+PUT /api/v1/users/{id}
+Authorization: Bearer <JWT_TOKEN>
+```
+
+**パスパラメータ**:
+- `id`: ユーザー ID (Long)
+
+**リクエストボディ**:
+```json
+{
+  "username": "newusername",
+  "email": "newemail@example.com",
+  "currentPassword": "currentPassword",
+  "newPassword": "NewSecurePass123!"
+}
+```
+
+**レスポンス** (200 OK):
+```json
+{
+  "id": 1,
+  "username": "newusername",
+  "email": "newemail@example.com",
+  "createdAt": "2024-01-01T09:00:00+09:00",
+  "updatedAt": "2024-01-01T12:00:00+09:00"
+}
+```
+
+### 13. パスワード変更
+```
+PUT /api/v1/users/{id}/password
+Authorization: Bearer <JWT_TOKEN>
+```
+
+**パスパラメータ**:
+- `id`: ユーザー ID (Long)
+
+**リクエストボディ**:
+```json
+{
+  "currentPassword": "currentPassword",
+  "newPassword": "NewSecurePass123!"
+}
+```
+
+**レスポンス** (204 No Content):
+レスポンスボディなし
+
+### 14. ユーザーアカウント削除
+```
+DELETE /api/v1/users/{id}
+Authorization: Bearer <JWT_TOKEN>
+```
+
+**パスパラメータ**:
+- `id`: ユーザー ID (Long)
+
+**レスポンス** (204 No Content):
+レスポンスボディなし
+
 ## データモデル
 
 ### TodoStatus (Enum)
@@ -329,9 +470,8 @@ Authorization: Bearer <JWT_TOKEN>
 
 ### RegisterRequest
 - `email`: 必須、有効なメールアドレス形式
-- `password`: 必須、最小6文字
-- `firstName`: 必須、最大50文字
-- `lastName`: 必須、最大50文字
+- `password`: 必須、強力なパスワード（8文字以上、大文字・小文字・数字・特殊文字を含む）
+- `username`: 必須、3-20文字
 
 ### LoginRequest
 - `email`: 必須、有効なメールアドレス形式
@@ -342,6 +482,7 @@ Authorization: Bearer <JWT_TOKEN>
 - `description`: 任意、最大1000文字
 - `priority`: 任意（デフォルト: MEDIUM）
 - `dueDate`: 任意
+- `parentId`: 任意、親TODO ID
 
 ### UpdateTodoRequest
 - `title`: 必須、最大255文字
@@ -349,6 +490,17 @@ Authorization: Bearer <JWT_TOKEN>
 - `status`: 必須
 - `priority`: 必須
 - `dueDate`: 任意
+- `parentId`: 任意、親TODO ID
+
+### UpdateUserRequest
+- `username`: 任意、3-20文字
+- `email`: 任意、有効なメールアドレス形式
+- `currentPassword`: 必須（パスワード変更時）
+- `newPassword`: 任意、強力なパスワード
+
+### ChangePasswordRequest
+- `currentPassword`: 必須
+- `newPassword`: 必須、強力なパスワード
 
 ## セキュリティ設定
 
@@ -373,9 +525,8 @@ curl -X POST http://localhost:8080/api/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
-    "password": "password123",
-    "firstName": "太郎",
-    "lastName": "山田"
+    "password": "SecurePass123!",
+    "username": "testuser"
   }'
 ```
 
@@ -419,6 +570,35 @@ curl -X PUT http://localhost:8080/api/v1/todos/1 \
     "status": "DONE",
     "priority": "LOW",
     "dueDate": "2024-12-25"
+  }'
+```
+
+#### 6. 現在のユーザー情報取得（要認証）
+```bash
+curl -X GET http://localhost:8080/api/v1/auth/me \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+#### 7. 子タスク一覧取得（要認証）
+```bash
+curl -X GET http://localhost:8080/api/v1/todos/1/children \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+#### 8. ステータス別TODO取得（要認証）
+```bash
+curl -X GET http://localhost:8080/api/v1/todos/status/IN_PROGRESS \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+#### 9. パスワード変更（要認証）
+```bash
+curl -X PUT http://localhost:8080/api/v1/users/1/password \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{
+    "currentPassword": "SecurePass123!",
+    "newPassword": "NewSecurePass456!"
   }'
 ```
 
