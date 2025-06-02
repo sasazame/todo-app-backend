@@ -64,4 +64,14 @@ public interface TodoRepository {
      * ユーザーIDとステータスでTODOを検索する
      */
     List<TodoEntity> findByUserIdAndStatus(Long userId, TodoStatus status);
+    
+    /**
+     * ユーザーIDですべてのTODOを削除する
+     */
+    void deleteByUserId(Long userId);
+    
+    /**
+     * 親タスクIDで子タスクを検索する
+     */
+    List<TodoEntity> findByParentId(Long parentId);
 }

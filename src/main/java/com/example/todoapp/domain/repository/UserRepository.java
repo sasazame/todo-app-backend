@@ -13,4 +13,10 @@ public interface UserRepository {
     boolean existsByEmail(String email);
     
     Optional<User> findById(Long id);
+    
+    boolean existsByUsername(String username);
+    
+    void deleteById(Long id);
+    
+    Optional<User> findByUsername(String username);
 }

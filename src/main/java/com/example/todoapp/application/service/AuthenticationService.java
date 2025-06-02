@@ -6,7 +6,9 @@ import com.example.todoapp.infrastructure.security.JwtService;
 import com.example.todoapp.presentation.dto.request.LoginRequest;
 import com.example.todoapp.presentation.dto.request.RegisterRequest;
 import com.example.todoapp.presentation.dto.response.AuthenticationResponse;
+import com.example.todoapp.presentation.dto.response.UserResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
@@ -39,6 +42,7 @@ public class AuthenticationService {
         user.setUpdatedAt(LocalDateTime.now());
 
         User savedUser = userRepository.save(user);
+        log.info("New user registered with email: {} and username: {}", savedUser.getEmail(), savedUser.getUsername());
 
         UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
                 .username(savedUser.getEmail())
@@ -49,12 +53,12 @@ public class AuthenticationService {
         String accessToken = jwtService.generateToken(userDetails);
         String refreshToken = jwtService.generateRefreshToken(userDetails);
 
-        AuthenticationResponse.UserResponse userResponse = new AuthenticationResponse.UserResponse(
+        UserResponse userResponse = new UserResponse(
                 savedUser.getId(),
                 savedUser.getUsername(),
                 savedUser.getEmail(),
-                savedUser.getCreatedAt().toString(),
-                savedUser.getUpdatedAt().toString()
+                savedUser.getCreatedAt(),
+                savedUser.getUpdatedAt()
         );
 
         return new AuthenticationResponse(accessToken, refreshToken, userResponse);
@@ -70,6 +74,8 @@ public class AuthenticationService {
 
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        log.info("User logged in with email: {}", user.getEmail());
 
         UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
                 .username(user.getEmail())
@@ -80,12 +86,12 @@ public class AuthenticationService {
         String accessToken = jwtService.generateToken(userDetails);
         String refreshToken = jwtService.generateRefreshToken(userDetails);
 
-        AuthenticationResponse.UserResponse userResponse = new AuthenticationResponse.UserResponse(
+        UserResponse userResponse = new UserResponse(
                 user.getId(),
                 user.getUsername(),
                 user.getEmail(),
-                user.getCreatedAt().toString(),
-                user.getUpdatedAt().toString()
+                user.getCreatedAt(),
+                user.getUpdatedAt()
         );
 
         return new AuthenticationResponse(accessToken, refreshToken, userResponse);

@@ -51,7 +51,8 @@ class TodoOwnershipServiceTest {
                 "Test Todo",
                 "Test Description",
                 TodoPriority.HIGH,
-                LocalDate.now().plusDays(1)
+                LocalDate.now().plusDays(1),
+                null
         );
 
         TodoEntity savedTodo = new TodoEntity(
@@ -218,7 +219,8 @@ class TodoOwnershipServiceTest {
                 "New Description",
                 TodoStatus.DONE,
                 TodoPriority.HIGH,
-                LocalDate.now().plusDays(1)
+                LocalDate.now().plusDays(1),
+                null
         );
 
         when(todoRepository.findById(todoId)).thenReturn(Optional.of(existingTodo));
@@ -254,7 +256,8 @@ class TodoOwnershipServiceTest {
                 "New Description",
                 TodoStatus.DONE,
                 TodoPriority.HIGH,
-                LocalDate.now().plusDays(1)
+                LocalDate.now().plusDays(1),
+                null
         );
 
         when(todoRepository.findById(todoId)).thenReturn(Optional.of(existingTodo));

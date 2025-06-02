@@ -41,6 +41,16 @@ public class TodoEntity {
     @Column(name = "due_date")
     private LocalDate dueDate;
 
+    @Column(name = "parent_id")
+    private Long parentId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id", insertable = false, updatable = false)
+    private TodoEntity parent;
+
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<TodoEntity> children = new java.util.ArrayList<>();
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private ZonedDateTime createdAt;
@@ -61,6 +71,12 @@ public class TodoEntity {
         this.status = status;
         this.priority = priority;
         this.dueDate = dueDate;
+    }
+
+    public TodoEntity(Long userId, String title, String description, TodoStatus status,
+                      TodoPriority priority, LocalDate dueDate, Long parentId) {
+        this(userId, title, description, status, priority, dueDate);
+        this.parentId = parentId;
     }
 
     // Getters and Setters
@@ -136,6 +152,30 @@ public class TodoEntity {
         this.updatedAt = updatedAt;
     }
 
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
+    }
+
+    public TodoEntity getParent() {
+        return parent;
+    }
+
+    public void setParent(TodoEntity parent) {
+        this.parent = parent;
+    }
+
+    public java.util.List<TodoEntity> getChildren() {
+        return children;
+    }
+
+    public void setChildren(java.util.List<TodoEntity> children) {
+        this.children = children;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -157,6 +197,7 @@ public class TodoEntity {
                 ", status=" + status +
                 ", priority=" + priority +
                 ", dueDate=" + dueDate +
+                ", parentId=" + parentId +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';

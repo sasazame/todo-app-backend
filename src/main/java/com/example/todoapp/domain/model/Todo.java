@@ -19,6 +19,7 @@ public class Todo {
     private TodoPriority priority;
     private LocalDate dueDate;
     private Long userId;  // User ownership
+    private Long parentId;  // Parent task ID for hierarchical structure
     private ZonedDateTime createdAt;
     private ZonedDateTime updatedAt;
 }

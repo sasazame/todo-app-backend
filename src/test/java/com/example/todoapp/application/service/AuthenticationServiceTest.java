@@ -6,6 +6,7 @@ import com.example.todoapp.infrastructure.security.JwtService;
 import com.example.todoapp.presentation.dto.request.LoginRequest;
 import com.example.todoapp.presentation.dto.request.RegisterRequest;
 import com.example.todoapp.presentation.dto.response.AuthenticationResponse;
+import com.example.todoapp.presentation.dto.response.UserResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -55,52 +56,49 @@ class AuthenticationServiceTest {
 
     @Test
     void shouldRegisterUserSuccessfully() {
-        RegisterRequest request = new RegisterRequest(
-                "test@example.com",
-                "password123",
-                "John",
-                "Doe"
-        );
+        RegisterRequest request = new RegisterRequest();
+        request.setEmail("test@example.com");
+        request.setPassword("Password123!");
+        request.setUsername("testuser");
 
         User savedUser = new User(
                 1L,
                 "test@example.com",
                 "encoded-password",
-                "John",
-                "Doe",
+                "testuser",
                 true,
                 LocalDateTime.now(),
                 LocalDateTime.now()
         );
 
         when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
-        when(passwordEncoder.encode("password123")).thenReturn("encoded-password");
+        when(passwordEncoder.encode("Password123!")).thenReturn("encoded-password");
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
         when(jwtService.generateToken(any(UserDetails.class))).thenReturn("jwt-token");
+        when(jwtService.generateRefreshToken(any(UserDetails.class))).thenReturn("refresh-token");
 
         AuthenticationResponse response = authenticationService.register(request);
 
         assertNotNull(response);
         assertEquals("jwt-token", response.getAccessToken());
-        assertEquals("test@example.com", response.getEmail());
-        assertEquals("John", response.getFirstName());
-        assertEquals("Doe", response.getLastName());
-        assertEquals("Bearer", response.getTokenType());
+        assertEquals("refresh-token", response.getRefreshToken());
+        assertNotNull(response.getUser());
+        assertEquals("test@example.com", response.getUser().email());
+        assertEquals("testuser", response.getUser().username());
 
         verify(userRepository).existsByEmail("test@example.com");
-        verify(passwordEncoder).encode("password123");
+        verify(passwordEncoder).encode("Password123!");
         verify(userRepository).save(any(User.class));
         verify(jwtService).generateToken(any(UserDetails.class));
+        verify(jwtService).generateRefreshToken(any(UserDetails.class));
     }
 
     @Test
     void shouldThrowExceptionWhenEmailAlreadyExists() {
-        RegisterRequest request = new RegisterRequest(
-                "test@example.com",
-                "password123",
-                "John",
-                "Doe"
-        );
+        RegisterRequest request = new RegisterRequest();
+        request.setEmail("test@example.com");
+        request.setPassword("Password123!");
+        request.setUsername("testuser");
 
         when(userRepository.existsByEmail("test@example.com")).thenReturn(true);
 
@@ -115,17 +113,15 @@ class AuthenticationServiceTest {
 
     @Test
     void shouldLoginUserSuccessfully() {
-        LoginRequest request = new LoginRequest(
-                "test@example.com",
-                "password123"
-        );
+        LoginRequest request = new LoginRequest();
+        request.setEmail("test@example.com");
+        request.setPassword("Password123!");
 
         User user = new User(
                 1L,
                 "test@example.com",
                 "encoded-password",
-                "John",
-                "Doe",
+                "testuser",
                 true,
                 LocalDateTime.now(),
                 LocalDateTime.now()
@@ -137,27 +133,28 @@ class AuthenticationServiceTest {
                 .thenReturn(authentication);
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
         when(jwtService.generateToken(any(UserDetails.class))).thenReturn("jwt-token");
+        when(jwtService.generateRefreshToken(any(UserDetails.class))).thenReturn("refresh-token");
 
         AuthenticationResponse response = authenticationService.login(request);
 
         assertNotNull(response);
         assertEquals("jwt-token", response.getAccessToken());
-        assertEquals("test@example.com", response.getEmail());
-        assertEquals("John", response.getFirstName());
-        assertEquals("Doe", response.getLastName());
-        assertEquals("Bearer", response.getTokenType());
+        assertEquals("refresh-token", response.getRefreshToken());
+        assertNotNull(response.getUser());
+        assertEquals("test@example.com", response.getUser().email());
+        assertEquals("testuser", response.getUser().username());
 
         verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
         verify(userRepository).findByEmail("test@example.com");
         verify(jwtService).generateToken(any(UserDetails.class));
+        verify(jwtService).generateRefreshToken(any(UserDetails.class));
     }
 
     @Test
     void shouldThrowExceptionForInvalidCredentials() {
-        LoginRequest request = new LoginRequest(
-                "test@example.com",
-                "wrongpassword"
-        );
+        LoginRequest request = new LoginRequest();
+        request.setEmail("test@example.com");
+        request.setPassword("wrongpassword");
 
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenThrow(new BadCredentialsException("Invalid credentials"));
@@ -172,10 +169,9 @@ class AuthenticationServiceTest {
 
     @Test
     void shouldThrowExceptionWhenUserNotFoundAfterAuthentication() {
-        LoginRequest request = new LoginRequest(
-                "test@example.com",
-                "password123"
-        );
+        LoginRequest request = new LoginRequest();
+        request.setEmail("test@example.com");
+        request.setPassword("Password123!");
 
         Authentication authentication = mock(Authentication.class);
 
