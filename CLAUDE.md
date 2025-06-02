@@ -64,27 +64,18 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 - **認証**: テスト用JWT設定
 
 ## アーキテクチャ構造
+**ヘキサゴナルアーキテクチャ** を採用し、各層の責務を明確に分離。
+
 ```
-src/main/java/com/example/todoapp/
-├── common/              # 共通コンポーネント
-│   ├── config/         # SecurityConfig等
-│   ├── exception/      # グローバル例外ハンドリング
-│   ├── util/           # ユーティリティ
-│   └── validation/     # バリデーション
-├── domain/              # ドメイン層（他に依存しない）
-│   ├── model/          # User, Todo, Enum等
-│   └── repository/     # リポジトリインターフェース
-├── application/         # アプリケーション層
-│   ├── dto/            # アプリケーション層DTO
-│   └── service/        # ビジネスロジック
-├── infrastructure/      # インフラ層
-│   ├── persistence/    # JPA実装
-│   └── security/       # JWT処理等
-└── presentation/        # プレゼンテーション層
-    ├── controller/     # REST API
-    ├── dto/            # リクエスト/レスポンスDTO
-    └── mapper/         # DTO変換
+src/main/java/com/zametech/todoapp/
+├── common/           # 共通コンポーネント
+├── domain/           # ドメイン層（ビジネスルール）
+├── application/      # アプリケーション層（ユースケース）
+├── infrastructure/   # インフラ層（外部システム連携）
+└── presentation/     # プレゼンテーション層（API）
 ```
+
+**📚 詳細**: [フォルダ構成ガイド](docs/FOLDER_STRUCTURE.md) 参照
 
 ## API仕様
 - **ベースURL**: `/api/v1`
