@@ -27,6 +27,6 @@ jwt:
 
 logging:
   level:
-    com.example.todoapp: DEBUG
+    com.zametech.todoapp: DEBUG
     org.springframework.security: DEBUG
     org.springframework.web: DEBUG

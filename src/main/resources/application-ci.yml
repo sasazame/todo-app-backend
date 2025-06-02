@@ -29,7 +29,7 @@ jwt:
 logging:
   level:
     root: WARN
-    com.example.todoapp: INFO
+    com.zametech.todoapp: INFO
     org.springframework.web: WARN
     org.springframework.security: WARN
     org.hibernate.SQL: WARN

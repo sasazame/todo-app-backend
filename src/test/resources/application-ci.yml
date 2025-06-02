@@ -28,7 +28,7 @@ jwt:
 # Logging
 logging:
   level:
-    com.example.todoapp: INFO
+    com.zametech.todoapp: INFO
     org.springframework.web: INFO
     org.springframework.security: INFO
     org.hibernate.SQL: INFO
